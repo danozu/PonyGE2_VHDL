@@ -1,0 +1,6 @@
+<design-module> ::= library ieee; use ieee.std_logic_1164.all; entity ind is port(d0: in std_ulogic; d1: in std_ulogic; d2: in std_ulogic; d3: in std_ulogic; d4: in std_ulogic; d5: in std_ulogic; d6: in std_ulogic; d7: in std_ulogic; a2: in std_ulogic; a1: in std_ulogic; a0: in std_ulogic; o: out std_ulogic); end ind; architecture behave of ind is begin process(d0,d1,d2,d3,d4,d5,d6,d7, a2, a1, a0) begin <statement> end process; end behave;
+<statement> ::= <if-block> | <if-block><statement>
+<if-block> ::= if (a2=<address>) and (a1=<address>) and (a0=<address>) then o <= <expr>; end if; 
+<expr> ::= (<expr> and <expr>) | (<expr> or <expr>) | (not <expr>) | <data>
+<address> ::= "'0'" | "'1'"
+<data> ::= d0 | d1 | d2 | d3 | d4 | d5 | d6 | d7

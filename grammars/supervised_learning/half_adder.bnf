@@ -1,0 +1,7 @@
+<design-module> ::= <begin-module><code-block><end-module>
+<code-block> ::= <output> <= <expr>;
+<expr> ::= (<expr> and <expr>) | (<expr> or <expr>) | (not <expr>) | <data>
+<data> ::= a | b
+<output> ::= o
+<begin-module> ::= "library ieee; use ieee.std_logic_1164.all; entity ha is port(a: in std_ulogic; b: in std_ulogic; o: out std_ulogic; c: out std_ulogic); end ha; architecture behave of ha is begin "
+<end-module> ::= " end behave;"

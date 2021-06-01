@@ -1,0 +1,4 @@
+<design-module> ::= library ieee; use ieee.std_logic_1164.all; entity ind is port(d: in  STD_LOGIC_VECTOR (3 downto 0); o: out STD_LOGIC_VECTOR (6 downto 0)); end ind; architecture behave of ind is begin process(d) begin <statement> end process; end behave;
+<statement> ::= if <case> else o <= '"'<bit><bit><bit><bit><bit><bit><bit>'"'; end if;
+<case> ::= (d = '"'<bit><bit><bit><bit>'"') then o <= '"'<bit><bit><bit><bit><bit><bit><bit>'"'; | (d = '"'<bit><bit><bit><bit>'"') then o <= '"'<bit><bit><bit><bit><bit><bit><bit>'"'; elsif <case>
+<bit> ::= 0 | 1

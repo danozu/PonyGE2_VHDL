@@ -1,0 +1,5 @@
+<design-module> ::= library ieee; use ieee.std_logic_1164.all; entity ind is port(d: in  STD_LOGIC_VECTOR (3 downto 0); o: out STD_LOGIC_VECTOR (6 downto 0)); end ind; architecture behave of ind is begin process(d) begin <statement> end process; end behave;
+<statement> ::= if <case> else o <= '"'<seven-segment>'"'; end if;
+<case> ::= (d = '"'<bcd-value>'"') then o <= '"'<seven-segment>'"'; | (d = '"'<bcd-value>'"') then o <= '"'<seven-segment>'"'; elsif <case>
+<bcd-value> ::= 0000 | 0001 | 0010 | 0011 | 0100 | 0101 | 0110 | 0111 | 1000 | 1001 | 1010 | 1011 | 1100 | 1101 | 1110 | 1111
+<seven-segment> ::= 1111110 | 0110000 | 1101101 | 1111001 | 0110011 | 1011011 | 1011111 | 1110000 | 1111111 | 1110011 | 1110111 | 0011111 | 1001110 | 0111101 | 1001111 | 1000111
