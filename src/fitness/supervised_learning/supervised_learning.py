@@ -17,15 +17,9 @@ import shutil
 
 
 def subprocess_cmd(command):
-    process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True, cwd=r'../../VHDL/individuals')#'..\..\VHDL\multiplexer')
-    #process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True, cwd='../../VHDL/multiplexer')#'/individuals')
-    #process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True, cwd='../../VHDL/individuals')
+    process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True, cwd=r'../../VHDL/individuals')
     proc_stdout = process.communicate()[0].strip()
     return proc_stdout.decode('utf-8')
-
-def binaryToDecimal(n):
-    return int(n,2)
-
 
 def eval_vhdl(ind):
     r = random.randint(0,10**10)
@@ -81,9 +75,6 @@ def eval_vhdl(ind):
     elif params['PROBLEM'] == 'multiplexer':
         for i in range(len(yhat)):
             yhat[i] = int(yhat[i])
-    
-    
-    
     return yhat
 
 class supervised_learning(base_ff):
@@ -116,8 +107,6 @@ class supervised_learning(base_ff):
         # Regression/classification-style problems use training and test data.
         if params['DATASET_TEST']:
             self.training_test = True
-
-    
 
     def evaluate(self, ind, **kwargs):
         """

@@ -432,49 +432,14 @@ def set_params(command_line_args, create_files=True):
                        
                        """)
             
-            #multiplexer 11 bits
-    #        for i in range(inputs):
-    #            file.write(variables[i] + ": in std_ulogic(3 downto 0); \n") #write inputs
-    #        file.write(variables[inputs] + ": out std_ulogic(6 downto 0)); \nend component; \nsignal ") #write output
-    #        for i in range(inputs):
-    #            file.write(variables[i] + ", ") #write inputs
-    #        file.write(variables[inputs] + ": std_ulogic; \nbegin \nindividual: ind  port map (")
-    #        for i in range(inputs):
-    #            file.write(variables[i] + " => " + variables[i] + ", ")
-    #        file.write(variables[inputs] + " => " + variables[inputs] + "); \nprocess begin \n")
-            
-            #dataset = open("Train.csv","r")
             data = dataset.readlines()[0:] #it is reading from second line
             for line in data:
-                    
-            #with open("Train.csv","r") as f:
-            #    for line in f:
-            #        data = f.readline()
-            #        print(len(data))
                 data_separate = line.split()
                 for i in range(inputs):
                     file.write(variables[i] + ' <= "' + data_separate[i] + '";\n')
                 file.write("wait for 1 ns; \nreport " + "'" + " & to_hstring(o) & " + "'" + ";\n\n")
-                #outros
-                #file.write("wait for 1 ns; \nreport std_ulogic'image(" + variables[inputs] + ") & CR;\n\n")
             
             dataset.close()
             
             file.write("	wait; \n	end process; \nend test;")
             file.close()
-            
-            
-           
-            #Creating a file ind.vhdl to check if the errors stop
-    #        file = open(r"C:\Users\allan\Dropbox\Doutorado\VHDL\multiplexer\ind.vhdl","w")
-    #        file.write("""entity ind is end ind;""")
-    #        file.close()
-            
-    #        import subprocess
-            #Analysing testbench and creating executable
-    #        subprocess.run(['ghdl', '-a', 'tb.vhdl'],cwd='..\..\VHDL\ssd')
-    #        subprocess.run(['ghdl', '-a', '--std=08', 'tb.vhdl'],cwd='../../VHDL/ssd')
-    #        subprocess.run(['ghdl', '-a', '--std=08', 'tb.vhdl'],cwd=r'C:\Users\allan\Downloads\Doutorado\VHDL\ssd')
-            #subprocess.run(['ghdl', '-e', 'tb'],cwd='..\..\VHDL\multiplexer') #talvez possa retirar depois
-    #        subprocess.run(['ghdl', '-e', '--std=08', 'tb'],cwd='../../VHDL/ssd') #talvez possa retirar depois
-    #        subprocess.run(['ghdl', '-e', '--std=08', 'tb'],cwd=r'C:\Users\allan\Downloads\Doutorado\VHDL\ssd') #talvez possa retirar depois

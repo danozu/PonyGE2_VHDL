@@ -18,90 +18,6 @@ def selection(population):
 
     return params['SELECTION'](population)
 
-def another_lexicase(population) -> List[Individual]:
-    """
-    Given an entire population, choose the individuals that do the best on
-    randomly chosen test cases. Allows for selection of 'specialist' individuals
-    that do very well on some test cases even if they do poorly on others.
-
-    :param population: A population from which to select individuals.
-    :return: A population of the selected individuals from lexicase selection -- allows
-             repeated individuals
-    """
-    # Initialise list of lexicase selections
-    winners = []
-
-    # Max or min
-    maximise_fitness = params['FITNESS_FUNCTION'].maximise
-
-    # The flag "INVALID_SELECTION" allows for selection of invalid individuals.
-    if params['INVALID_SELECTION']:
-        available = population
-    else:
-        available = [i for i in population if not i.invalid]
-
-    # Basic ensure individuals have been tested on same number of test cases, and that there is at least one test case
-    assert (len(available[0].test_case_results) == len(available[1].test_case_results))
-    assert (len(available[0].test_case_results) > 0)
-
-    while len(winners) < params['GENERATION_SIZE']:
-        # Random ordering of test cases
-        random_test_case_list = list(range(len(available[0].test_case_results)))
-        shuffle(random_test_case_list)
-
-        # Only choose from a sample not from the entire available population
-
-        if params['LEXICASE_TOURNAMENT']:
-            candidates = sample(available, params['TOURNAMENT_SIZE'])
-        else:
-            candidates = available
-        candidate_size = len(candidates)
-        while candidate_size > 0:
-            # Calculate best score for chosen test case from candidates
-            scores = []
-            for ind in candidates:
-                scores.append(ind.test_case_results[random_test_case_list[0]])
-            if maximise_fitness:
-                best_score = max(scores)
-            else:
-                best_score = min(scores)
-
-            # Only retain individuals who have the best score for the test case
-            remaining = []
-            candidate_size = 0
-            for ind in candidates:
-                if ind.test_case_results[random_test_case_list[0]] == best_score:
-                    remaining.append(ind)
-                    candidate_size += 1
-            candidates = remaining
-
-            # If only one individual remains, choose that individual
-            if len(candidates) == 1:
-                winners.append(candidates[0])
-                break
-                
-            # If this was the last test case, randomly choose an individual from remaining candidates
-            elif len(random_test_case_list) == 1:
-                # Penalize longer solutions
-                min_nodes = params["MAX_TREE_NODES"] + 1
-                best_ind = None
-                for ind in candidates:
-                    if ind.nodes < min_nodes:
-                        best_ind = ind
-                        min_nodes = ind.nodes
-                winners.append(best_ind)
-
-                # Choose randomly among solutions
-                # winners.append(sample(candidates, 1)[0])
-                break
-
-            # Go to next test case and loop
-            else:
-                random_test_case_list.pop(0)
-
-    # Return the population of lexicase selections.
-    return winners
-
 def lexicase(population):
     
     # Initialise list of lexicase winners.
@@ -129,7 +45,7 @@ def lexicase(population):
 
         if len(candidates) == 1:
             winners.append(candidates[0])
-        elif len(cases) == 0:# and len(candidates) >= 1:
+        elif len(cases) == 0:
             r = randint(0,len(candidates)-1)
             winners.append(candidates[r])
         
