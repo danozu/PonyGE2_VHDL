@@ -162,18 +162,43 @@ class supervised_learning(base_ff):
             if params['PROBLEM_TYPE'] == 'vhdl':
                 yhat = eval_vhdl(ind.phenotype)
             else:
-                # phenotype won't refer to C
                 yhat = eval(ind.phenotype)
+            #    y = (y > 0)
+            #    yhat = (yhat > 0)
+            
+            if params['SAMPLING'] == 'interleaved':
+                if stats['gen'] % 2 == 0: #even
+                    pass
+                else: #odd
+                    r = random.randint(0,len(y)-1)
+                    y = y[r]
+                    yhat = yhat[r]
+            elif params['SAMPLING'] == 'interleaved_p':
+                if stats['gen'] % 2 == 0: #even
+                    pass
+                else: #odd
+                    list_indexes = list(range(len(y)))
+                    random.shuffle(list_indexes)
+                    r = random.random() #per cent between 0 and 100%
+                    l = max(1,int(len(y)*r)) #number of samples used
+                    y = y[list_indexes[0:l]]
+                    yhat = [yhat[i] for i in list_indexes[0:l]]
+                    
+            assert np.isrealobj(yhat)
+            
+            if params['PENALTY_COEFFICIENT']:
+                error = params['ERROR_METRIC'](y, yhat)
+                if error == 0: #just apply penalties to individuals with perfect score
+                    error = ind.nodes/params['PENALTY_COEFFICIENT']
+            else:
+                error = params['ERROR_METRIC'](y, yhat)
             
             if params['lexicase']:
-                assert np.isrealobj(yhat)
                 y = (y > 0)
                 yhat = (yhat > 0)
                 self.predict_result = np.equal(y,yhat)
-                return params['ERROR_METRIC'](y, yhat), self.predict_result
+                return error, self.predict_result
             else:
-                assert np.isrealobj(yhat)
-    
                 # let's always call the error function with the true
                 # values first, the estimate second
-                return params['ERROR_METRIC'](y, yhat)
+                return error
