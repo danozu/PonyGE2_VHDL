@@ -1,7 +1,7 @@
 import numpy as np
 np.seterr(all="raise")
 
-from algorithm.parameters import params
+from algorithm.parameters import params, set_params
 from utilities.fitness.get_data import get_data
 from utilities.fitness.math_functions import *
 from utilities.fitness.optimize_constants import optimize_constants
@@ -14,6 +14,8 @@ import random
 
 import os
 import shutil
+
+from stats.stats import stats
 
 
 def subprocess_cmd(command):
