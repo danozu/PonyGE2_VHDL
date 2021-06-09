@@ -185,6 +185,7 @@ class supervised_learning(base_ff):
                     y = y[list_indexes[0:l]]
                     yhat = [yhat[i] for i in list_indexes[0:l]]
                     
+            
             assert np.isrealobj(yhat)
             
             if params['PENALTY_COEFFICIENT']:
