@@ -18,6 +18,6 @@ PENALTY_COEFFICIENT:	10000
 POPULATION_SIZE:        500
 FITNESS_FUNCTION:       supervised_learning.supervised_learning
 REPLACEMENT:            generational
-SAMPLING:		interleaved
+SAMPLING:		interleaved_p
 SELECTION:              lexicase
 VERBOSE: 				True
