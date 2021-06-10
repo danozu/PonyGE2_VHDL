@@ -13,7 +13,7 @@ params = {
 
         # Set default step and search loop functions
         'SAMPLING': 'interleaved',
-        'PENALTY_COEFFICIENT': 10000,
+        'PENALTY_COEFFICIENT': None, #10000,
         'PROBLEM': None,#'multiplexer',
         'PROBLEM_TYPE': None,#'vhdl',
         'SIMULATOR': 'ghdl', #ghdl, nvc
