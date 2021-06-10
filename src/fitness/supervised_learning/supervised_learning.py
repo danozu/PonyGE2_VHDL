@@ -164,6 +164,11 @@ class supervised_learning(base_ff):
                 yhat = eval_vhdl(ind.phenotype)
             else:
                 yhat = eval(ind.phenotype)
+                if np.shape(y) != np.shape(yhat):
+                    l = len(y)
+                    temp = yhat
+                    yhat = np.zeros([l], dtype=float)
+                    yhat[:] = temp
             #    y = (y > 0)
             #    yhat = (yhat > 0)
             
@@ -196,8 +201,8 @@ class supervised_learning(base_ff):
                 error = params['ERROR_METRIC'](y, yhat)
             
             if params['lexicase']:
-                y = (y > 0)
-                yhat = (yhat > 0)
+#                y = (y > 0)
+#                yhat = (yhat > 0)
                 self.predict_result = np.equal(y,yhat)
                 return error, self.predict_result
             else:
