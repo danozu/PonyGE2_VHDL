@@ -9,7 +9,6 @@ from utilities.fitness.optimize_constants import optimize_constants
 from fitness.base_ff_classes.base_ff import base_ff
 
 import subprocess
-import numpy as np
 import random
 
 import os
@@ -172,23 +171,25 @@ class supervised_learning(base_ff):
             #    y = (y > 0)
             #    yhat = (yhat > 0)
             
-            if params['SAMPLING'] == 'interleaved':
+            # take only one sample every next generation (odd)
+            if params['SAMPLING'] == 'interleaved_one':
                 if stats['gen'] % 2 == 0: #even
                     pass
                 else: #odd
                     r = random.randint(0,len(y)-1)
                     y = y[r]
                     yhat = yhat[r]
-            elif params['SAMPLING'] == 'interleaved_p':
+            # take only one sample every next generation (odd)
+            elif params['SAMPLING'] == 'interleaved_rand':
                 if stats['gen'] % 2 == 0: #even
                     pass
                 else: #odd
                     list_indexes = list(range(len(y)))
                     random.shuffle(list_indexes)
-                    r = random.random() #per cent between 0 and 100%
-                    l = max(1,int(len(y)*r)) #number of samples used
-                    y = y[list_indexes[0:l]]
-                    yhat = [yhat[i] for i in list_indexes[0:l]]
+                    r = random.random() # random number in [0,1]
+                    n = max(1,round(len(y)*r)) #number of samples used
+                    y = y[list_indexes[0:n]]
+                    yhat = [yhat[i] for i in list_indexes[0:n]]
                     
             
             assert np.isrealobj(yhat)
@@ -206,6 +207,6 @@ class supervised_learning(base_ff):
                 self.predict_result = np.equal(y,yhat)
                 return error, self.predict_result
             else:
-                # let's always call the error function with the true
-                # values first, the estimate second
+                # let's always call the error function with 
+                # the true values first, the estimate second
                 return error

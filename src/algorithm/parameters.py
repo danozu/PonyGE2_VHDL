@@ -12,7 +12,7 @@ machine_name = hostname[0]
 params = {
 
         # Set default step and search loop functions
-        'SAMPLING': 'interleaved',
+        'SAMPLING': 'interleaved_p',
         'PENALTY_COEFFICIENT': None, #10000,
         'PROBLEM': None,#'multiplexer',
         'PROBLEM_TYPE': None,#'vhdl',
@@ -77,7 +77,7 @@ params = {
 
         # SELECTION
         # Set selection operator.
-        'SELECTION': "operators.selection.tournament",
+        'SELECTION': "operators.selection.lexicase",
         # For tournament selection
         'TOURNAMENT_SIZE': 2,
         # For truncation selection

@@ -18,6 +18,12 @@ def initialise_run_params(create_files):
     :return: Nothing
     """
 
+    print("Running PonyGE2_Allan_v1.2 with: \n", \
+           "selection = ", params['SELECTION'], \
+           "\nsampling = ", params['SAMPLING'],"\n"\
+           "======================================")
+
+    
     start = datetime.now()
     trackers.time_list.append(time())
 
