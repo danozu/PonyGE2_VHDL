@@ -17,6 +17,6 @@ MUTATION:               int_flip_per_codon
 POPULATION_SIZE:        500
 FITNESS_FUNCTION:       supervised_learning.supervised_learning
 REPLACEMENT:            generational
-SAMPLING:		None
+SAMPLING:		            None
 SELECTION:              lexicase
-VERBOSE: 				True
+VERBOSE: 				        True
