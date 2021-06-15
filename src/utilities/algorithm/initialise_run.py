@@ -182,6 +182,109 @@ def set_param_imports():
                                                              attr_name)
 
 
+def set_selection_imports():
+    """
+    This function is similar to the latter, but it just works for selection.
+
+    :return: Nothing.
+    """
+
+    # For these ops we let the param equal the function itself.
+    ops = {'operators': ['SELECTION']}
+
+    # We have to take 'algorithm' first as the functions from
+    # algorithm need to be imported before any others to prevent
+    # circular imports. We have to take 'utilities.fitness' before
+    # 'fitness' because ERROR_METRIC has to be set in order to call
+    # the fitness function constructor.
+
+    for special_ops in ['operators']:
+
+        if all([callable(params[op]) for op in ops[special_ops]]):
+            # params are already functions
+            pass
+
+        else:
+
+            for op in ops[special_ops]:
+
+                if params[op] is not None:
+                    # Split import name based on "." to find nested modules.
+                    split_name = params[op].split(".")
+
+                    if len(split_name) > 1:
+                        # Check to see if a full path has been specified.
+
+                        # Get attribute name.
+                        attr_name = split_name[-1]
+
+                        try:
+                            # Try and use the exact specified path to load
+                            # the module.
+
+                            # Get module name.
+                            module_name = ".".join(split_name[:-1])
+
+                            # Import module and attribute and save.
+                            params[op] = return_attr_from_module(module_name,
+                                                                 attr_name)
+
+                        except Exception:
+                            # Either a full path has not actually been
+                            # specified, or the module doesn't exist. Try to
+                            # append specified module to default location.
+
+                            # Get module name.
+                            module_name = ".".join([special_ops,
+                                                    ".".join(split_name[:-1])])
+
+                            try:
+                                # Import module and attribute and save.
+                                params[op] = return_attr_from_module(module_name,
+                                                                     attr_name)
+
+                            except Exception:
+                                s = "utilities.algorithm.initialise_run." \
+                                    "set_param_imports\n" \
+                                    "Error: Specified %s function not found:" \
+                                    " %s\n" \
+                                    "       Checked locations: %s\n" \
+                                    "                          %s\n" \
+                                    "       Please ensure parameter is " \
+                                    "specified correctly." % \
+                                    (op.lower(), attr_name, params[op],
+                                     ".".join([module_name, attr_name]))
+                                raise Exception(s)
+                                
+                    else:
+                        # Just module name specified. Use default location.
+
+                        # If multi-agent is specified need to change
+                        # how search and step module is called
+                        # Loop and step functions for multi-agent is contained
+                        # inside algorithm search_loop_distributed and 
+                        # step_distributed respectively
+
+                        if params['MULTIAGENT'] and \
+                        ( op == 'SEARCH_LOOP' or op == 'STEP' ) :
+                            # Define the directory structure for the multi-agent search
+                            # loop and step
+                            multiagent_ops = {'search_loop':'distributed_algorithm.search_loop' \
+                                                ,'step':'distributed_algorithm.step'}
+
+                            # Get module and attribute names
+                            module_name = ".".join([special_ops, multiagent_ops[op.lower()]])
+                            attr_name = split_name[-1]
+
+                        else:
+                            # Get module and attribute names.
+                            module_name = ".".join([special_ops, op.lower()])
+                            attr_name = split_name[-1]
+
+                        # Import module and attribute and save.
+                        params[op] = return_attr_from_module(module_name,
+                                                             attr_name)
+                                                             
 def get_fit_func_imports():
     """
     Special handling needs to be done for fitness function imports,
