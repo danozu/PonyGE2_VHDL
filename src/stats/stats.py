@@ -340,8 +340,8 @@ def print_generation_stats():
 
     :return: Nothing.
     """
-
-    print("______\n")
+    
+    print("\n------------ Generation ", stats["gen"], "------------")
     for stat in sorted(stats.keys()):
         print(" ", stat, ": \t", stats[stat])
     print("\n")
