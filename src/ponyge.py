@@ -15,7 +15,6 @@ from stats.stats import get_stats
 from algorithm.parameters import params, set_params
 import sys
 
-
 def mane():
     """ Run program """
 

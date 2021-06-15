@@ -112,7 +112,7 @@ def get_soo_stats(individuals, end):
     elif not params['SILENT']:
         # Print simple display output.
         perc = stats['gen'] / (params['GENERATIONS']+1) * 100
-        stdout.write("Evolution: %d%% complete\r" % perc)
+        stdout.write("=======================================\n\nEvolution: %d%% complete\r" % perc)
         stdout.flush()
 
     # Generate test fitness on regression problems
@@ -238,7 +238,7 @@ def get_moo_stats(individuals, end):
     elif not params['SILENT']:
         # Print simple display output.
         perc = stats['gen'] / (params['GENERATIONS'] + 1) * 100
-        stdout.write("Evolution: %d%% complete\r" % perc)
+        stdout.write("=======================================\n\nEvolution: %d%% complete\r" % perc)
         stdout.flush()
 
     # Generate test fitness on regression problems
