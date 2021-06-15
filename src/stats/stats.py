@@ -36,11 +36,14 @@ stats = {
         "min_tree_nodes": 0,
         "ave_fitness": 0,
         "best_fitness": 0,
+        "time_selection": 0,
         "time_taken": 0,
         "total_time": 0,
-        "time_adjust": 0
+        "time_adjust": 0,
+        "best_individual_nodes": 0,
+        "best_individual_gates": 0,
+        "individuals_with_perfect_score": 0
 }
-
 
 def get_stats(individuals, end=False):
     """
@@ -88,10 +91,33 @@ def get_soo_stats(individuals, end):
 
     # Get best individual.
     best = max(individuals)
-
+    
+    if best.fitness < 0.0625:
+        # Include conditional on disallowing updating the best individual on odd generations because not all test cases are tested.
+        if params['SAMPLING']:
+            if stats['gen'] % 2 == 0: 
+                l = len(individuals)
+                n_best = 0
+                for i in range(l):
+                    if individuals[i].fitness < 0.0625:
+                        n_best += 1
+                stats['individuals_with_perfect_score'] = n_best
+        else:
+            l = len(individuals)
+            n_best = 0
+            for i in range(l):
+                if individuals[i].fitness < 0.0625:
+                    n_best += 1
+            stats['individuals_with_perfect_score'] = n_best
+    
     if not trackers.best_ever or best > trackers.best_ever:
-        # Save best individual in trackers.best_ever.
-        trackers.best_ever = best
+        if params['SAMPLING']:
+            if stats['gen'] % 2 == 0: 
+                # Don't update the best individual on odd generations, because not all testacases are tested
+                trackers.best_ever = best
+        else:
+            # Save best individual in trackers.best_ever.
+            trackers.best_ever = best
 
     if end or params['VERBOSE'] or not params['DEBUG']:
         # Update all stats.
@@ -326,6 +352,17 @@ def update_stats(individuals, end):
     stats['max_tree_nodes'] = np.nanmax(nodes)
     stats['ave_tree_nodes'] = np.nanmean(nodes)
     stats['min_tree_nodes'] = np.nanmin(nodes)
+    stats['best_individual_nodes'] = trackers.best_ever.nodes
+#    print(trackers.best_ever.phenotype)
+    if params['COUNT_GATES']:
+        l = len(params['GATES_TO_COUNT'])
+        n_gates = 0
+        for i in range(l):
+            n_gates += trackers.best_ever.phenotype.count(params['GATES_TO_COUNT'][i])
+    #n_and = trackers.best_ever.phenotype.count("and")
+    #n_xor = trackers.best_ever.phenotype.count("xor")
+#    print("and= ", n_and, "; xor= ", n_xor)
+        stats['best_individual_gates'] = n_gates
 
     if not hasattr(params['FITNESS_FUNCTION'], 'multi_objective'):
         # Fitness Stats
@@ -340,7 +377,7 @@ def print_generation_stats():
 
     :return: Nothing.
     """
-    
+
     print("\n------------ Generation ", stats["gen"], "------------")
     for stat in sorted(stats.keys()):
         print(" ", stat, ": \t", stats[stat])
