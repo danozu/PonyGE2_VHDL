@@ -7,6 +7,13 @@ from utilities.algorithm.NSGA2 import compute_pareto_metrics, \
 from representation.individual import Individual
 from typing import List
 
+from utilities.algorithm.initialise_run import set_selection_imports
+
+import time
+from stats.stats import stats
+import numpy as np
+
+
 def selection(population):
     """
     Perform selection on a population in order to select a population of
@@ -15,11 +22,23 @@ def selection(population):
     :param population: input population
     :return: selected population
     """
-
-    return params['SELECTION'](population)
+    
+    print(population[0].n_samples)
+    if params['CHANGE'] == True and params['SELECTION_CHANGE'] == True: #stop doing lexicase
+        params['lexicase'] = False
+        params['CHANGE'] = False
+        params['SELECTION'] = "operators.selection.tournament"
+        set_selection_imports()
+        
+    start = time.time()    
+    selection = params['SELECTION'](population)
+    end = time.time()
+    stats['time_selection'] = end-start
+    
+    return selection
 
 def lexicase(population):
-    
+    print("Doing lexicase")   
     # Initialise list of lexicase winners.
     winners = []
     
@@ -28,36 +47,108 @@ def lexicase(population):
         candidates = population
     else:
         candidates = [i for i in population if not i.invalid]
-   
-    l_samples = len(candidates[0].predict_result)
-    
-    cases = list(range(0,l_samples))
-    
-    while len(winners) < params['GENERATION_SIZE']:
-        shuffle(cases)
-        while len(candidates) > 1 and len(cases) > 0:
-            candidates_update = [i for i in candidates if i.predict_result[cases[0]] == True]
-            #if there is no individual which predicted the case correctly, then we return the list of candidates to the previous stage
-            if len(candidates_update) == 0:
-                candidates_update = [i for i in candidates if i.predict_result[cases[0]] == False]
-            del cases[0]
-            candidates = candidates_update
-
-        if len(candidates) == 1:
-            winners.append(candidates[0])
-        elif len(cases) == 0:
-            r = randint(0,len(candidates)-1)
-            winners.append(candidates[r])
         
-        if params['INVALID_SELECTION']:
-            candidates = population
-        else:
-            candidates = [i for i in population if not i.invalid]
-       
-        cases = list(range(0,l_samples))
+    if params['SAMPLING'] == 'interleaved_rand' and stats['gen'] % 2 != 0: #odd
+        l_samples = np.shape(population[0].predict_result)[0] #[0] because the result is (_, )
+        list_indexes = list(range(l_samples))
+        shuffle(list_indexes)
+        n = randint(1,l_samples) #number of samples used
+        print("doing interleaved_rand sampling with n_samples = ", n)
+        
+        cases = list(range(0,n))
+        
+        while len(winners) < params['GENERATION_SIZE']:
+            shuffle(cases)
             
-    return winners
+            for i in range(len(candidates)):
+                candidates[i].partial_predict_result = candidates[i].predict_result[list_indexes[0:n]] 
+        
+            while len(candidates) > 1 and len(cases) > 0:
+                candidates_update = [i for i in candidates if i.partial_predict_result[cases[0]] == True]
+                #if there is no individual which predicted the case correctly, then we return the list of candidates to the previous stage
+                if len(candidates_update) == 0:
+                    candidates_update = [i for i in candidates if i.partial_predict_result[cases[0]] == False]
+                del cases[0]
+                candidates = candidates_update
+    
+            if len(candidates) == 1:
+                winners.append(candidates[0])
+            elif len(cases) == 0:# and len(candidates) >= 1:
+                r = randint(0,len(candidates)-1)
+                winners.append(candidates[r])
+            
+            if params['INVALID_SELECTION']:
+                candidates = population
+            else:
+                candidates = [i for i in population if not i.invalid]
+           
+            cases = list(range(0,n))
+            
+    elif params['SAMPLING'] == 'interleaved_delta' and stats['gen'] % 2 != 0: #odd
+        l_samples = np.shape(population[0].predict_result)[0] #[0] because the result is (_, )
+        n = round(params['SAMPLING_COEFFICIENT']*l_samples) #number of samples used
+        list_indexes = list(range(l_samples))
+        shuffle(list_indexes)
+        print("doing interleaved_delta sampling with n_samples = ", n)
+        
+        cases = list(range(0,n))
+        
+        while len(winners) < params['GENERATION_SIZE']:
+            shuffle(cases)
+            for i in range(len(candidates)):
+                candidates[i].partial_predict_result = candidates[i].predict_result[list_indexes[0:n]] 
+        
+            while len(candidates) > 1 and len(cases) > 0:
+                candidates_update = [i for i in candidates if i.partial_predict_result[cases[0]] == True]
+                #if there is no individual which predicted the case correctly, then we return the list of candidates to the previous stage
+                if len(candidates_update) == 0:
+                    candidates_update = [i for i in candidates if i.partial_predict_result[cases[0]] == False]
+                del cases[0]
+                candidates = candidates_update
+    
+            if len(candidates) == 1:
+                winners.append(candidates[0])
+            elif len(cases) == 0:# and len(candidates) >= 1:
+                r = randint(0,len(candidates)-1)
+                winners.append(candidates[r])
+            
+            if params['INVALID_SELECTION']:
+                candidates = population
+            else:
+                candidates = [i for i in population if not i.invalid]
+           
+            cases = list(range(0,n))        
 
+    else:
+        l_samples = np.shape(candidates[0].predict_result)[0] #[0] because the result is (_, )
+        print(l_samples)
+    
+        cases = list(range(0,l_samples))
+        
+        while len(winners) < params['GENERATION_SIZE']:
+            shuffle(cases)
+            while len(candidates) > 1 and len(cases) > 0:
+                candidates_update = [i for i in candidates if i.predict_result[cases[0]] == True]
+                #if there is no individual which predicted the case correctly, then we return the list of candidates to the previous stage
+                if len(candidates_update) == 0:
+                    candidates_update = [i for i in candidates if i.predict_result[cases[0]] == False]
+                del cases[0]
+                candidates = candidates_update
+    
+            if len(candidates) == 1:
+                winners.append(candidates[0])
+            elif len(cases) == 0:# and len(candidates) >= 1:
+                r = randint(0,len(candidates)-1)
+                winners.append(candidates[r])
+            
+            if params['INVALID_SELECTION']:
+                candidates = population
+            else:
+                candidates = [i for i in population if not i.invalid]
+           
+            cases = list(range(0,l_samples))
+        
+    return winners
 
 def tournament(population):
     """
@@ -68,7 +159,7 @@ def tournament(population):
     :return: A population of the winners from tournaments.
     """
     
-    #print(population)
+    print("doing tournament")
 
     # Initialise list of tournament winners.
     winners = []
@@ -78,24 +169,55 @@ def tournament(population):
         available = population
     else:
         available = [i for i in population if not i.invalid]
-
-    while len(winners) < params['GENERATION_SIZE']:
-        # Randomly choose TOURNAMENT_SIZE competitors from the given
-        # population. Allows for re-sampling of individuals.
-        competitors = sample(available, params['TOURNAMENT_SIZE'])
-        #random.sample(sequence, k)
-        #Returns: k length new list of elements chosen from the sequence.
-#        print()
-#        print(competitors[0].test, competitors[1].fitness)
-#        print(max(competitors).fitness)
-
-        # Return the single best competitor.
-        winners.append(max(competitors))
+        
+    candidates = []
+        
+    if params['SAMPLING'] == 'interleaved_rand' and stats['gen'] % 2 != 0: #odd
+        l_samples = 16#population[0].n_samples
+        list_indexes = list(range(l_samples))
+        shuffle(list_indexes)
+        n = randint(1,l_samples) #number of samples used
+        print("doing interleaved_rand sampling with r = ", n)
+        for i in range(n):
+            candidates.append(population[list_indexes[i]])
+        print(len(candidates))
+        while len(winners) < params['GENERATION_SIZE']:
+            # Randomly choose TOURNAMENT_SIZE competitors from the given
+            # sampling candidates. Allows for re-sampling of individuals.
+            competitors = sample(candidates, params['TOURNAMENT_SIZE'])
+    
+            # Return the single best competitor.
+            winners.append(max(competitors))
+        
+            
+    elif params['SAMPLING'] == 'interleaved_delta' and stats['gen'] % 2 != 0: #odd
+        l_samples = 16#population[0].n_samples
+        n = round(params['SAMPLING_COEFFICIENT']*l_samples) #number of samples used
+        list_indexes = list(range(l_samples))
+        shuffle(list_indexes)
+        print("doing interleaved_delta sampling with r = ", n)
+        for i in range(n):
+            candidates.append(population[list_indexes[i]])
+        print(len(candidates))
+        while len(winners) < params['GENERATION_SIZE']:
+            # Randomly choose TOURNAMENT_SIZE competitors from the given
+            # sampling candidates. Allows for re-sampling of individuals.
+            competitors = sample(candidates, params['TOURNAMENT_SIZE'])
+    
+            # Return the single best competitor.
+            winners.append(max(competitors))
+        
+    else:
+        while len(winners) < params['GENERATION_SIZE']:
+            # Randomly choose TOURNAMENT_SIZE competitors from the given
+            # population. Allows for re-sampling of individuals.
+            competitors = sample(available, params['TOURNAMENT_SIZE'])
+    
+            # Return the single best competitor.
+            winners.append(max(competitors))
 
     # Return the population of tournament winners.
-    #print(winners)
     return winners
-
 
 def truncation(population):
     """
