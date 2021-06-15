@@ -38,7 +38,7 @@ def selection(population):
     return selection
 
 def lexicase(population):
-    print("Doing lexicase")   
+    #print("Doing lexicase")   
     # Initialise list of lexicase winners.
     winners = []
     
@@ -121,7 +121,7 @@ def lexicase(population):
 
     else:
         l_samples = np.shape(candidates[0].predict_result)[0] #[0] because the result is (_, )
-        print(l_samples)
+        #print(l_samples)
     
         cases = list(range(0,l_samples))
         
