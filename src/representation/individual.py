@@ -35,6 +35,8 @@ class Individual(object):
         self.runtime_error = False
         self.name = None
         self.predict_result = [] #len = population_size; Each position receives 1 if prediction is correct, 0 if false.
+        self.partial_predict_result = [] #len < population_size; It is used for interleaved sampling
+        self.n_samples = 0
 
 
     def __lt__(self, other):
@@ -124,7 +126,7 @@ class Individual(object):
             self.fitness, self.predict_result = params['FITNESS_FUNCTION'](self)
         else:            
             # Evaluate fitness using specified fitness function.
-            self.fitness = params['FITNESS_FUNCTION'](self)
+            self.fitness, self.n_samples = params['FITNESS_FUNCTION'](self)
         
      
         
