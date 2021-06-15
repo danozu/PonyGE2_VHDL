@@ -28,6 +28,8 @@ def search_loop():
 
     # Generate statistics for run so far
     get_stats(individuals)
+    
+    generation_stopping = 0
 
     # Traditional GE
     for generation in range(1, (params['GENERATIONS']+1)):
@@ -35,6 +37,25 @@ def search_loop():
 
         # New generation
         individuals = params['STEP'](individuals)
+        if max(individuals).fitness < 0.0625 and params['SELECTION_CHANGE'] == True:
+            generation_stopping = generation
+            params.update({'CHANGE': True})
+            break
+
+    if generation_stopping > 0:
+        if params['MULTICORE']:
+            # Close the workers pool (otherwise they'll live on forever).
+            params['POOL'].close()
+        if params['MULTICORE']:
+            # initialize pool once, if multi-core is enabled
+            params['POOL'] = Pool(processes=params['CORES'], initializer=pool_init,
+                                  initargs=(params,))  # , maxtasksperchild=1)
+    
+        for generation in range(generation_stopping, (params['GENERATIONS']+1)):
+            stats['gen'] = generation
+    
+            # New generation
+            individuals = params['STEP'](individuals)
 
     if params['MULTICORE']:
         # Close the workers pool (otherwise they'll live on forever).
