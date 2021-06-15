@@ -11,17 +11,17 @@ machine_name = hostname[0]
 """Algorithm parameters"""
 params = {
         #New parameters
-        'COUNT_GATES': True, #if true, put the number of gates in the stats
-        'GATES_TO_COUNT': ['and', 'xor'], #list of the gates to count
+        'COUNT_GATES': False, #if true, put the number of gates in the stats
+        'GATES_TO_COUNT': None, #list of the gates to count
         'SELECTION_CHANGE': False,#True, #if True, change from lexicase to tournament after one individual achieves perfect score
         'CHANGE': False, #Internal parameter, don't change. When True, do the change previously mentioned
         'SAMPLING': 'interleaved_delta',#interleaved_one',#'interleaved_rand', #interleaved_delta
         'SAMPLING_COEFFICIENT': 0.5, #percentage of used samples in odd generation when sampling is interleaved_delta
         'PENALTY_COEFFICIENT': None, #10000,
         'PENALTY_TYPE': 'gates',
-        'PROBLEM': '2-bit multiplier', #2-bit multiplier; multiplexer; ssd
-        'PROBLEM_TYPE': 'vhdl',
-        'SIMULATOR': 'ghdl', #ghdl, nvc
+        'PROBLEM': None, #2-bit multiplier; multiplexer; ssd
+        'PROBLEM_TYPE': None, #vhdl
+        'SIMULATOR': None, #ghdl, nvc
         
         # Set default step and search loop functions
         'SEARCH_LOOP': 'search_loop',
