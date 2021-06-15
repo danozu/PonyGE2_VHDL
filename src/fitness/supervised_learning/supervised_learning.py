@@ -9,6 +9,7 @@ from utilities.fitness.optimize_constants import optimize_constants
 from fitness.base_ff_classes.base_ff import base_ff
 
 import subprocess
+import numpy as np
 import random
 
 import os
@@ -39,6 +40,10 @@ def eval_vhdl(ind):
     
     elif params['PROBLEM'] == 'multiplexer':
         with open(r'../../VHDL/multiplexer/tb.vhdl', 'r') as file :
+            filedata = file.read()
+    
+    elif params['PROBLEM'] == '2-bit multiplier':
+        with open(r'../../VHDL/2-bit multiplier/tb.vhdl', 'r') as file :
             filedata = file.read()
     
     # Replace the target string
@@ -75,6 +80,11 @@ def eval_vhdl(ind):
     elif params['PROBLEM'] == 'multiplexer':
         for i in range(len(yhat)):
             yhat[i] = int(yhat[i])
+    
+    elif params['PROBLEM'] == '2-bit multiplier':
+        for i in range(len(yhat)):
+            yhat[i] = int(yhat[i],16)
+    
     return yhat
 
 class supervised_learning(base_ff):
@@ -106,7 +116,7 @@ class supervised_learning(base_ff):
 
         # Regression/classification-style problems use training and test data.
         if params['DATASET_TEST']:
-            self.training_test = True
+            self.training_test = True    
 
     def evaluate(self, ind, **kwargs):
         """
@@ -161,52 +171,56 @@ class supervised_learning(base_ff):
         else:
             if params['PROBLEM_TYPE'] == 'vhdl':
                 yhat = eval_vhdl(ind.phenotype)
+                #print(stats['gen'])
             else:
+                # phenotype won't refer to C
                 yhat = eval(ind.phenotype)
-                if np.shape(y) != np.shape(yhat):
-                    l = len(y)
-                    temp = yhat
-                    yhat = np.zeros([l], dtype=float)
-                    yhat[:] = temp
-            #    y = (y > 0)
-            #    yhat = (yhat > 0)
+                #y = (y > 0)
+                #yhat = (yhat > 0)
             
-            # take only one sample every next generation (odd)
-            if params['SAMPLING'] == 'interleaved_one':
-                if stats['gen'] % 2 == 0: #even
-                    pass
-                else: #odd
-                    r = random.randint(0,len(y)-1)
-                    y = y[r]
-                    yhat = yhat[r]
-            # take only one sample every next generation (odd)
-            elif params['SAMPLING'] == 'interleaved_rand':
-                if stats['gen'] % 2 == 0: #even
-                    pass
-                else: #odd
-                    list_indexes = list(range(len(y)))
-                    random.shuffle(list_indexes)
-                    r = random.random() # random number in [0,1]
-                    n = max(1,round(len(y)*r)) #number of samples used
-                    y = y[list_indexes[0:n]]
-                    yhat = [yhat[i] for i in list_indexes[0:n]]
+#            if params['SAMPLING'] == 'interleaved_one':
+#                if stats['gen'] % 2 == 0: #even
+#                    pass
+#                else: #odd
+#                    r = random.randint(0,len(y)-1)
+#                    y = y[r]
+#                    yhat = yhat[r]
+#            elif params['SAMPLING'] == 'interleaved_rand':
+#                print("doing interleaved")
+#                if stats['gen'] % 2 == 0: #even
+#                    pass
+#                else: #odd
+#                    list_indexes = list(range(len(y)))
+#                    random.shuffle(list_indexes)
+#                    r = random.random() #per cent between 0 and 100%
+                    #n = max(1,int(len(y)*r)) #number of samples used
+#                    n = random.randint(1,len(y)) #number of samples used
+#                    y = y[list_indexes[0:n]]
+#                    yhat = [yhat[i] for i in list_indexes[0:n]]
+#                    print(len(y),len(yhat))
                     
-            
             assert np.isrealobj(yhat)
             
             if params['PENALTY_COEFFICIENT']:
                 error = params['ERROR_METRIC'](y, yhat)
                 if error == 0: #just apply penalties to individuals with perfect score
-                    error = ind.nodes/params['PENALTY_COEFFICIENT']
+                    if params['PENALTY_TYPE'] == 'gates':
+                        l = len(params['GATES_TO_COUNT'])
+                        n_gates = 0
+                        for i in range(l):
+                            n_gates += ind.phenotype.count(params['GATES_TO_COUNT'][i])
+                        error = n_gates/params['PENALTY_COEFFICIENT']
+                    elif params['PENALTY_TYPE'] == 'nodes':
+                        error = ind.nodes/params['PENALTY_COEFFICIENT']
             else:
                 error = params['ERROR_METRIC'](y, yhat)
             
             if params['lexicase']:
-#                y = (y > 0)
-#                yhat = (yhat > 0)
                 self.predict_result = np.equal(y,yhat)
                 return error, self.predict_result
+            
             else:
-                # let's always call the error function with 
-                # the true values first, the estimate second
-                return error
+                self.n_samples = len(y)
+                # let's always call the error function with the true
+                # values first, the estimate second
+                return error, self.n_samples
