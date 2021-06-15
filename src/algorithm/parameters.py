@@ -10,18 +10,25 @@ machine_name = hostname[0]
 
 """Algorithm parameters"""
 params = {
-
-        # Set default step and search loop functions
-        'SAMPLING': 'interleaved_p',
+        #New parameters
+        'COUNT_GATES': True, #if true, put the number of gates in the stats
+        'GATES_TO_COUNT': ['and', 'xor'], #list of the gates to count
+        'SELECTION_CHANGE': False,#True, #if True, change from lexicase to tournament after one individual achieves perfect score
+        'CHANGE': False, #Internal parameter, don't change. When True, do the change previously mentioned
+        'SAMPLING': 'interleaved_delta',#interleaved_one',#'interleaved_rand', #interleaved_delta
+        'SAMPLING_COEFFICIENT': 0.5, #percentage of used samples in odd generation when sampling is interleaved_delta
         'PENALTY_COEFFICIENT': None, #10000,
-        'PROBLEM': None,#'multiplexer',
-        'PROBLEM_TYPE': None,#'vhdl',
+        'PENALTY_TYPE': 'gates',
+        'PROBLEM': '2-bit multiplier', #2-bit multiplier; multiplexer; ssd
+        'PROBLEM_TYPE': 'vhdl',
         'SIMULATOR': 'ghdl', #ghdl, nvc
+        
+        # Set default step and search loop functions
         'SEARCH_LOOP': 'search_loop',
         'STEP': 'step',
 
         # Evolutionary Parameters
-        'POPULATION_SIZE': 100,
+        'POPULATION_SIZE': 20,
         'GENERATIONS': 50,
         'HILL_CLIMBING_HISTORY': 1000,
         'SCHC_COUNT_METHOD': "count_all",
@@ -30,7 +37,7 @@ params = {
         'EXPERIMENT_NAME': None,
         # Set default number of runs to be done.
         # ONLY USED WITH EXPERIMENT MANAGER.
-        'RUNS': 2,
+        'RUNS': 1,
 
         # Class of problem
         'FITNESS_FUNCTION': "supervised_learning.supervised_learning",
@@ -77,7 +84,7 @@ params = {
 
         # SELECTION
         # Set selection operator.
-        'SELECTION': "operators.selection.lexicase",
+        'SELECTION': "operators.selection.tournament",
         # For tournament selection
         'TOURNAMENT_SIZE': 2,
         # For truncation selection
@@ -319,7 +326,7 @@ def set_params(command_line_args, create_files=True):
 
         # Initialise run lists and folders before we set imports.r
         initialise_run_params(create_files)
-            
+       
         # Set correct param imports for specified function options, including
         # error metrics and fitness functions.
         set_param_imports()
