@@ -11,6 +11,7 @@ machine_name = hostname[0]
 """Algorithm parameters"""
 params = {
         #New parameters
+        'ONE_FILE_PER_GENERATION': True, #if true, put all individuals in just one vhdl file
         'COUNT_GATES': False, #if true, put the number of gates in the stats
         'GATES_TO_COUNT': None, #list of the gates to count
         'SELECTION_CHANGE': False,#True, #if True, change from lexicase to tournament after one individual achieves perfect score
