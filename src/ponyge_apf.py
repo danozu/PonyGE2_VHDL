@@ -42,7 +42,7 @@ class BaseSymbolic(BaseEstimator, metaclass=ABCMeta):
                  MAX_INIT_TREE_DEPTH=10,
                  MAX_TREE_DEPTH=17,
                  RANDOM_SEED=7,
-                 data_address="Sarcoidose/",
+                 DATA_ADDRESS="Sarcoidose/",
                  ):
         self.CROSSOVER_PROBABILITY = CROSSOVER_PROBABILITY
         self.GENERATIONS = GENERATIONS
