@@ -50,7 +50,7 @@ class BaseSymbolic(BaseEstimator, metaclass=ABCMeta):
         self.MAX_INIT_TREE_DEPTH = MAX_INIT_TREE_DEPTH
         self.MAX_TREE_DEPTH = MAX_TREE_DEPTH
         self.RANDOM_SEED = RANDOM_SEED
-        self.data_address = data_address
+        self.DATA_ADDRESS = DATA_ADDRESS
 
 
     def fit(self, X, y):
@@ -80,8 +80,8 @@ class BaseSymbolic(BaseEstimator, metaclass=ABCMeta):
             head.append('x'+str(j))
         head.append('class')
 
-        pd.DataFrame(data).to_csv("../datasets/"  self.data_addres + "Train" + str(i) + ".csv", header=head, sep=" ", index=None)
-        pd.DataFrame(data).to_csv("../datasets/"  self.data_addres + "Test" + str(i) + ".csv", header=head, sep=" ", index=None)
+        pd.DataFrame(data).to_csv("../datasets/"  self.DATA_ADDRESS + "Train" + str(i) + ".csv", header=head, sep=" ", index=None)
+        pd.DataFrame(data).to_csv("../datasets/"  self.DATA_ADDRESS + "Test" + str(i) + ".csv", header=head, sep=" ", index=None)
 
 #        load_params('C:/Users/allan/Dropbox/Mestrado - PEL/Pesquisa/sarcoidose/PonyGE2-master/parameters/classification.txt')
 
@@ -91,8 +91,8 @@ class BaseSymbolic(BaseEstimator, metaclass=ABCMeta):
         params['MAX_INIT_TREE_DEPTH'] = self.MAX_INIT_TREE_DEPTH
         params['MAX_TREE_DEPTH'] = self.MAX_TREE_DEPTH
         params['RANDOM_SEED'] = self.RANDOM_SEED
-        params['DATASET_TRAIN'] = self.data_addres + 'Train'+ str(i) + '.csv'
-        params['DATASET_TEST'] = self.data_addres + 'Test'+ str(i) + '.csv'
+        params['DATASET_TRAIN'] = self.DATA_ADDRESS + 'Train'+ str(i) + '.csv'
+        params['DATASET_TEST'] = self.DATA_ADDRESS + 'Test'+ str(i) + '.csv'
         params['SAVE_PLOTS'] = False
         params['CACHE'] = False
         params['SILENT'] = True
@@ -121,7 +121,7 @@ class ponyge(BaseSymbolic, ClassifierMixin):
                  MAX_INIT_TREE_DEPTH=10,
                  MAX_TREE_DEPTH=17,
                  RANDOM_SEED=7,
-                 data_address="Sarcoidose/",
+                 DATA_ADDRESS="Sarcoidose/",
                  ):
          super(ponyge, self).__init__(
              CROSSOVER_PROBABILITY = CROSSOVER_PROBABILITY,
@@ -131,7 +131,7 @@ class ponyge(BaseSymbolic, ClassifierMixin):
              MAX_INIT_TREE_DEPTH = MAX_INIT_TREE_DEPTH,
              MAX_TREE_DEPTH = MAX_TREE_DEPTH,
              RANDOM_SEED = RANDOM_SEED,
-             data_address = data_address)
+             DATA_ADDRESS = DATA_ADDRESS)
 
     def predict_proba(self, X):
         """Predict probabilities on test vectors X.
