@@ -29,9 +29,56 @@ def evaluate_fitness(individuals):
 
     results, pool = [], None
     
+    if params['ONE_FILE_PER_GENERATION']:
+        for name, ind in enumerate(individuals):
+            ind.name = name
+            
+            # Iterate over all individuals in the population.
+            if ind.invalid:
+                # Invalid individuals cannot be evaluated and are given a bad
+                # default fitness.
+                ind.fitness = params['FITNESS_FUNCTION'].default_fitness
+                stats['invalids'] += 1
+    
+            else:
+                ind.eval_ind = True
+    
+                # Valid individuals can be evaluated.
+                if params['CACHE'] and ind.phenotype in cache:
+                    # The individual has been encountered before in
+                    # the utilities.trackers.cache.
+    
+                    if params['LOOKUP_FITNESS']:
+                        # Set the fitness as the previous fitness from the
+                        # cache.
+                        ind.fitness = cache[ind.phenotype]
+                        ind.eval_ind = False
+    
+                    elif params['LOOKUP_BAD_FITNESS']:
+                        # Give the individual a bad default fitness.
+                        ind.fitness = params['FITNESS_FUNCTION'].default_fitness
+                        ind.eval_ind = False
+    
+                    elif params['MUTATE_DUPLICATES']:
+                        # Mutate the individual to produce a new phenotype
+                        # which has not been encountered yet.
+                        while (not ind.phenotype) or ind.phenotype in cache:
+                            ind = params['MUTATION'](ind)
+                            stats['regens'] += 1
+                        
+                        # Need to overwrite the current individual in the pop.
+                        individuals[name] = ind
+                        ind.name = name
+        
+       # print(individuals[0].predict_result)
+        eval_or_append_pop(individuals)
+       # print(individuals[0].predict_result)
+        
+        return individuals#params['FITNESS_FUNCTION'](individuals)
+    
     if params['MULTICORE']:
         pool = params['POOL']
-
+    
     for name, ind in enumerate(individuals):
         ind.name = name
 
@@ -43,7 +90,7 @@ def evaluate_fitness(individuals):
             stats['invalids'] += 1
 
         else:
-            eval_ind = True
+            ind.eval_ind = True
 
             # Valid individuals can be evaluated.
             if params['CACHE'] and ind.phenotype in cache:
@@ -54,12 +101,12 @@ def evaluate_fitness(individuals):
                     # Set the fitness as the previous fitness from the
                     # cache.
                     ind.fitness = cache[ind.phenotype]
-                    eval_ind = False
+                    ind.eval_ind = False
 
                 elif params['LOOKUP_BAD_FITNESS']:
                     # Give the individual a bad default fitness.
                     ind.fitness = params['FITNESS_FUNCTION'].default_fitness
-                    eval_ind = False
+                    ind.eval_ind = False
 
                 elif params['MUTATE_DUPLICATES']:
                     # Mutate the individual to produce a new phenotype
@@ -72,7 +119,7 @@ def evaluate_fitness(individuals):
                     individuals[name] = ind
                     ind.name = name
 
-            if eval_ind:
+            if ind.eval_ind:
                 results = eval_or_append(ind, results, pool)
 
     if params['MULTICORE']:
@@ -92,7 +139,6 @@ def evaluate_fitness(individuals):
                 runtime_error_cache.append(ind.phenotype)
                     
     return individuals
-
 
 def eval_or_append(ind, results, pool):
     """
@@ -133,3 +179,9 @@ def eval_or_append(ind, results, pool):
                 
                 # All fitnesses are valid.
                 cache[ind.phenotype] = ind.fitness
+
+def eval_or_append_pop(individuals):
+    """Same as above, but it evolves the whole population at the same time.
+    It does not work with multicore evaluation."""
+    
+    params['FITNESS_FUNCTION'](individuals)

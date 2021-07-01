@@ -37,6 +37,7 @@ class Individual(object):
         self.predict_result = [] #len = population_size; Each position receives 1 if prediction is correct, 0 if false.
         self.partial_predict_result = [] #len < population_size; It is used for interleaved sampling
         self.n_samples = 0
+        self.eval_ind = False #if the individual will be evaluated
 
 
     def __lt__(self, other):
