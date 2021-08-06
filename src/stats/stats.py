@@ -382,7 +382,7 @@ def update_stats(individuals, end):
     if not hasattr(params['FITNESS_FUNCTION'], 'multi_objective'):
         # Fitness Stats
         fitnesses = [i.fitness  for i in individuals]
-        if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+        if params['ADAPTIVE_CROSSOVER_AND_MUTATION']:
             crossover_probabilities = [i.crossover_probability for i in individuals]
             mutation_probabilities = [i.mutation_probability for i in individuals]
             stats['ave_ind_crossover_prob'] = np.nanmean(crossover_probabilities, axis=0)
