@@ -5,7 +5,7 @@ from stats.stats import stats, get_stats
 from utilities.stats import trackers
 from operators.initialisation import initialisation
 from utilities.algorithm.initialise_run import pool_init
-from operators.adaptative import update_crossover_and_mutation
+from operators.adaptive import update_crossover_and_mutation
 
 def search_loop():
     """
@@ -30,7 +30,7 @@ def search_loop():
     # Generate statistics for run so far
     get_stats(individuals)
     
-    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+    if params['ADAPTIVE_CROSSOVER_AND_MUTATION']:
         individuals = update_crossover_and_mutation(individuals)
     
     generation_stopping = 0
