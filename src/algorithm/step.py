@@ -23,7 +23,7 @@ def step(individuals):
     # Select parents from the original population.
     parents = selection(individuals)
     
-#    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+#    if params['ADAPTIVE_CROSSOVER_AND_MUTATION']:
 #        parents = update_crossover_and_mutation(parents)
     
     # Crossover parents and add to the new population.
@@ -35,7 +35,7 @@ def step(individuals):
     # Evaluate the fitness of the new population.
     new_pop = evaluate_fitness(new_pop)
     
-#    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+#    if params['ADAPTIVE_CROSSOVER_AND_MUTATION']:
 #        new_pop = update_crossover_and_mutation(new_pop)
 
 #    for i in range(100):
@@ -47,7 +47,7 @@ def step(individuals):
     # Generate statistics for run so far
     get_stats(individuals)
     
-    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+    if params['ADAPTIVE_CROSSOVER_AND_MUTATION']:
         individuals = update_crossover_and_mutation(individuals)
     
     return individuals
