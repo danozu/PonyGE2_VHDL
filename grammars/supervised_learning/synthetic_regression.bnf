@@ -1,0 +1,5 @@
+<S>	::= <expr>
+<expr>  ::= <func> | <var> | <op>
+<func>  ::= psin(<expr>) | pcos(<expr>) | min_(<expr>, <expr>) | max_(<expr>, <expr>)
+<op>    ::= add(<expr>, <expr>) | mul(<expr>, <expr>) | sub(<expr>, <expr>) | protected_div(<expr>, <expr>)
+<var>   ::= x[0] | 1 | 0 
