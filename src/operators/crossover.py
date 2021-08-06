@@ -101,7 +101,7 @@ def variable_onepoint(p_0, p_1):
     # Select unique points on each genome for crossover to occur.
     pt_0, pt_1 = randint(1, max_p_0), randint(1, max_p_1)
     
-    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+    if params['ADAPTIVE_CROSSOVER_AND_MUTATION']:
         crossover_probability = np.nanmax([p_0.crossover_probability, p_1.crossover_probability])
  #       if crossover_probability != 0.8:
  #           print("diferente")
@@ -125,8 +125,8 @@ def variable_onepoint(p_0, p_1):
     ind_0 = individual.Individual(c_0, None)
     ind_1 = individual.Individual(c_1, None)
     
-    # Maintain the same mutation probability to do the next step, if we are using adaptative crossover and mutation
-    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+    # Maintain the same mutation probability to do the next step, if we are using adaptive crossover and mutation
+    if params['ADAPTIVE_CROSSOVER_AND_MUTATION']:
         ind_0.crossover_probability = p_0.crossover_probability
         ind_1.crossover_probability = p_1.crossover_probability
         ind_0.mutation_probability = p_0.mutation_probability
