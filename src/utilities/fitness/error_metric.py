@@ -14,26 +14,11 @@ def mae(y, yhat):
     :return: The mean absolute error.
     """
     
-    #Verifica quais são iguais
-    #y_str = (y.astype(int)).astype(str) #multiplexer
-    #print(yhat)
-    #compare = np.in1d(y_str,yhat)
-    
-    #compare = np.compare_chararrays(y_str,yhat,"==", True) #multiplexer
-#    print(y_str)
-#    print(yhat)
-#    print(compare)
-#    print(np.mean(compare))
-
     compare = np.equal(y,yhat)
-    
- #   self.predict_result = compare
-    
-    #return np.mean(np.abs(y - yhat))
+
     return 1 - np.mean(compare)
 
 # Set maximise attribute for mae error metric.
-# In this setup I put True
 mae.maximise = False
 
 
@@ -61,11 +46,48 @@ def mse(y, yhat):
     :return: The mean square error.
     """
 
+#    print(y[0], yhat[0])
     return np.mean(np.square(y - yhat))
 
 # Set maximise attribute for mse error metric.
 mse.maximise = False
 
+import math
+
+def sigmoid(x):
+  return 1 / (1 + math.exp(-x))
+
+def rmse_tanh(y, yhat):
+    """
+    Calculate mean square error between inputs.
+
+    :param y: The expected input (i.e. from dataset).
+    :param yhat: The given input (i.e. from phenotype).
+    :return: The mean square error.
+    """
+    
+    raw = np.sqrt(np.mean(np.square(y - yhat)))
+
+    return np.tanh(raw)
+
+# Set maximise attribute for mse error metric.
+rmse_tanh.maximise = False
+
+def rmse_sigmoid(y, yhat):
+    """
+    Calculate mean square error between inputs.
+
+    :param y: The expected input (i.e. from dataset).
+    :param yhat: The given input (i.e. from phenotype).
+    :return: The mean square error.
+    """
+    
+    raw = np.sqrt(np.mean(np.square(y - yhat)))
+
+    return sigmoid(raw)
+
+# Set maximise attribute for mse error metric.
+rmse_sigmoid.maximise = False
 
 def hinge(y, yhat):
     """

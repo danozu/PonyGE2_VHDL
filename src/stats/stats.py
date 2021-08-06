@@ -11,6 +11,8 @@ from utilities.stats.save_plots import save_plot_from_data, \
     save_pareto_fitness_plot
 from utilities.stats.file_io import save_stats_to_file, save_stats_headers, \
     save_best_ind_to_file, save_first_front_to_file
+    
+from stats.propagation_delay import count_gates_critical_path
 
 
 """Algorithm statistics"""
@@ -42,7 +44,17 @@ stats = {
         "time_adjust": 0,
         "best_individual_nodes": 0,
         "best_individual_gates": 0,
-        "individuals_with_perfect_score": 0
+        "individuals_with_perfect_score": 0,
+        "best_ind_nodes_critical_path": 0,
+        "samples_used": 0,
+        "samples_attempted": 0,
+        "samples_unsuccessful1": 0,
+        "samples_unsuccessful2": 0,
+        "ave_ind_crossover_prob": 0,
+        "ave_ind_mutation_prob": 0,
+        "best_ind_crossover_prob": 0,
+        "best_ind_mutation_prob": 0,
+        "D_Euclidean": 0
 }
 
 def get_stats(individuals, end=False):
@@ -359,17 +371,31 @@ def update_stats(individuals, end):
         n_gates = 0
         for i in range(l):
             n_gates += trackers.best_ever.phenotype.count(params['GATES_TO_COUNT'][i])
-    #n_and = trackers.best_ever.phenotype.count("and")
-    #n_xor = trackers.best_ever.phenotype.count("xor")
-#    print("and= ", n_and, "; xor= ", n_xor)
         stats['best_individual_gates'] = n_gates
+    if params['COUNT_CRITICAL_PATH']:
+        n_gates_critical_path = count_gates_critical_path(trackers.best_ever.phenotype, params['GATES_TO_COUNT'])
+        stats['best_ind_nodes_critical_path'] = n_gates_critical_path
+    
+#    stats['best_ind_crossover_prob'] = trackers.best_ever.crossover_probability
+#    stats['best_ind_mutation_prob'] = trackers.best_ever.mutation_probability
 
     if not hasattr(params['FITNESS_FUNCTION'], 'multi_objective'):
         # Fitness Stats
-        fitnesses = [i.fitness for i in individuals]
+        fitnesses = [i.fitness  for i in individuals]
+        if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+            crossover_probabilities = [i.crossover_probability for i in individuals]
+            mutation_probabilities = [i.mutation_probability for i in individuals]
+            stats['ave_ind_crossover_prob'] = np.nanmean(crossover_probabilities, axis=0)
+            stats['ave_ind_mutation_prob'] = np.nanmean(mutation_probabilities, axis=0)
+            stats['best_ind_crossover_prob'] = trackers.best_ever.crossover_probability
+            stats['best_ind_mutation_prob'] = trackers.best_ever.mutation_probability
+        else:
+            stats['ave_ind_crossover_prob'] = params['CROSSOVER_PROBABILITY']
+            stats['ave_ind_mutation_prob'] = params['MUTATION_PROBABILITY']
+            stats['best_ind_crossover_prob'] = params['CROSSOVER_PROBABILITY']
+            stats['best_ind_mutation_prob'] = params['MUTATION_PROBABILITY']
         stats['ave_fitness'] = np.nanmean(fitnesses, axis=0)
         stats['best_fitness'] = trackers.best_ever.fitness
-
 
 def print_generation_stats():
     """

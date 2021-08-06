@@ -17,13 +17,12 @@ def initialise_run_params(create_files):
 
     :return: Nothing
     """
-
-    print("Running PonyGE2_Allan_v1.2 with: \n", \
-           "selection = ", params['SELECTION'], \
-           "\nsampling = ", params['SAMPLING'],"\n"\
-           "======================================")
-
     
+    print("Running PonyGE2_Allan_v1.2 with: \n", \
+       "selection = ", params['SELECTION'], \
+       "\nsampling = ", params['SAMPLING'],"\n"\
+       "======================================")
+
     start = datetime.now()
     trackers.time_list.append(time())
 
@@ -181,7 +180,6 @@ def set_param_imports():
                         params[op] = return_attr_from_module(module_name,
                                                              attr_name)
 
-
 def set_selection_imports():
     """
     This function is similar to the latter, but it just works for selection.
@@ -284,7 +282,7 @@ def set_selection_imports():
                         # Import module and attribute and save.
                         params[op] = return_attr_from_module(module_name,
                                                              attr_name)
-                                                             
+                        
 def get_fit_func_imports():
     """
     Special handling needs to be done for fitness function imports,

@@ -5,6 +5,7 @@ from stats.stats import stats, get_stats
 from utilities.stats import trackers
 from operators.initialisation import initialisation
 from utilities.algorithm.initialise_run import pool_init
+from operators.adaptative import update_crossover_and_mutation
 
 def search_loop():
     """
@@ -29,6 +30,9 @@ def search_loop():
     # Generate statistics for run so far
     get_stats(individuals)
     
+    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+        individuals = update_crossover_and_mutation(individuals)
+    
     generation_stopping = 0
 
     # Traditional GE
@@ -51,7 +55,7 @@ def search_loop():
             params['POOL'] = Pool(processes=params['CORES'], initializer=pool_init,
                                   initargs=(params,))  # , maxtasksperchild=1)
     
-        for generation in range(generation_stopping, (params['GENERATIONS']+1)):
+        for generation in range(generation_stopping+1, (params['GENERATIONS']+1)):
             stats['gen'] = generation
     
             # New generation

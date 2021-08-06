@@ -2,7 +2,7 @@ from multiprocessing import cpu_count
 from os import path
 from socket import gethostname
 
-from utilities.fitness.error_metric import f1_score, mae
+from utilities.fitness.error_metric import f1_score, mae, mse, rmse_tanh
 
 hostname = gethostname().split('.')
 machine_name = hostname[0]
@@ -10,27 +10,32 @@ machine_name = hostname[0]
 
 """Algorithm parameters"""
 params = {
-        #New parameters
-        'ONE_FILE_PER_GENERATION': True, #if true, put all individuals in just one vhdl file
+        #New parameters 
+        'LEXICASE_EACH_BIT': False, #if True, compare each bit of the output to give a fitness score for each sample
+        'ADAPTATIVE_CROSSOVER_AND_MUTATION': False,  #if True, ignore crossover and mutation probabilities and use adaptative approach
+                                                    # it works just for variable_onepoint (crossover)
+        'COUNT_SAMPLES_USED_LEXICASE': False, #if true, count how many times each sample was chosen by Lexicase
+        'COUNT_CRITICAL_PATH': False, #if true, count the number of gates in the critical path
+        'ONE_FILE_PER_GENERATION': False,#True, #if true, put all individuals in just one vhdl file.
         'COUNT_GATES': False, #if true, put the number of gates in the stats
-        'GATES_TO_COUNT': None, #list of the gates to count
+        'GATES_TO_COUNT': ['and', 'xor'], # ['elsif'], ##list of the gates to count
         'SELECTION_CHANGE': False,#True, #if True, change from lexicase to tournament after one individual achieves perfect score
         'CHANGE': False, #Internal parameter, don't change. When True, do the change previously mentioned
-        'SAMPLING': 'interleaved_delta',#interleaved_one',#'interleaved_rand', #interleaved_delta
-        'SAMPLING_COEFFICIENT': 0.5, #percentage of used samples in odd generation when sampling is interleaved_delta
-        'PENALTY_COEFFICIENT': None, #10000,
-        'PENALTY_TYPE': 'gates',
-        'PROBLEM': None, #2-bit multiplier; multiplexer; ssd
-        'PROBLEM_TYPE': None, #vhdl
-        'SIMULATOR': None, #ghdl, nvc
+        'SAMPLING': None,#interleaved_one',#'interleaved_rand', #interleaved_delta
+        'SAMPLING_COEFFICIENT': None, #percentage of used samples in odd generation when sampling is interleaved_delta
+        'PENALTY_COEFFICIENT': 10000,
+        'PENALTY_TYPE': None,#'gates_critical_path',#'gates',#'gates_critical_path',#'gates', 
+        'PROBLEM': None,#'2-bit_multiplier', #2-bit_multiplier; multiplexer; ssd
+        'PROBLEM_TYPE': None,#'vhdl', #deprecated; Put supervised_learning_vhdl in 'fitness_function' to evolve this type of problem
+        'SIMULATOR': None,#'ghdl',#'ghdl', #ghdl, nvc
         
         # Set default step and search loop functions
         'SEARCH_LOOP': 'search_loop',
         'STEP': 'step',
 
         # Evolutionary Parameters
-        'POPULATION_SIZE': 20,
-        'GENERATIONS': 50,
+        'POPULATION_SIZE': 2000,
+        'GENERATIONS': 200,
         'HILL_CLIMBING_HISTORY': 1000,
         'SCHC_COUNT_METHOD': "count_all",
 
@@ -41,15 +46,15 @@ params = {
         'RUNS': 1,
 
         # Class of problem
-        'FITNESS_FUNCTION': "supervised_learning.supervised_learning",
+        'FITNESS_FUNCTION': "supervised_learning.regression",
 
         # Select problem dataset
-        'DATASET_TRAIN': "Banknote/Train.csv",
-        'DATASET_TEST': "Banknote/Test.csv",
+        'DATASET_TRAIN': "Vladislavleva4/Train.txt",#"2-bit_multiplier/Train.csv",#; multiplexer; ssd; "Synthetic Regression/Train2.csv", #
+        'DATASET_TEST': None,#"Synthetic Regression/Test.csv",
         'DATASET_DELIMITER': None,
 
         # Set grammar file
-        'GRAMMAR_FILE': "supervised_learning/Banknote.bnf",#"multiplexer_11bitA.bnf",
+        'GRAMMAR_FILE': "supervised_learning/Vladislavleva4.bnf",#"multiplexer_11bitpop.bnf",#"supervised_learning/synthetic_regression.bnf", #"multiplexer_11bitpop.bnf",#"2-bit_multiplier_B.bnf", #2-bit_multiplier_A.bnf; multiplexer_11bitA.bnf
 
         # Set the number of depths permutations are calculated for
         # (starting from the minimum path of the grammar).
@@ -57,10 +62,10 @@ params = {
         'PERMUTATION_RAMPS': 5,
 
         # Select error metric
-        'ERROR_METRIC': mae, #f1_score,
+        'ERROR_METRIC': mse, #rmse_tanh,#mae, #f1_score,
 
         # Optimise constants in the supervised_learning fitness function.
-        'OPTIMIZE_CONSTANTS': False,
+        'OPTIMIZE_CONSTANTS': False, #don't use for vhdl problems
 
         # Specify target for target problems
         'TARGET': "ponyge_rocks",
@@ -70,7 +75,7 @@ params = {
                                # INCREASE AT YOUR OWN RISK.
         'MAX_TREE_NODES': None,
         'CODON_SIZE': 100000,
-        'MAX_GENOME_LENGTH': None,
+        'MAX_GENOME_LENGTH': 500,
         'MAX_WRAPS': 0,
 
         # INITIALISATION
@@ -87,7 +92,7 @@ params = {
         # Set selection operator.
         'SELECTION': "operators.selection.tournament",
         # For tournament selection
-        'TOURNAMENT_SIZE': 2,
+        'TOURNAMENT_SIZE': 7,
         # For truncation selection
         'SELECTION_PROPORTION': 0.5,
         # Allow for selection of invalid individuals during selection process.
@@ -141,7 +146,7 @@ params = {
         'SAVE_ALL': False,
         # Save a plot of the evolution of the best fitness result for each
         # generation.
-        'SAVE_PLOTS': True,
+        'SAVE_PLOTS': False,
 
         # MULTIPROCESSING
         # Multi-core parallel processing of phenotype evaluations.
@@ -308,6 +313,7 @@ def set_params(command_line_args, create_files=True):
             params['lexicase'] = True
         else:
             params['lexicase'] = False
+#        print(1, params['SELECTION'])
 
         if params['REPLACEMENT'].split(".")[-1] == "steady_state":
             # Set steady state step and replacement.
@@ -327,10 +333,15 @@ def set_params(command_line_args, create_files=True):
 
         # Initialise run lists and folders before we set imports.r
         initialise_run_params(create_files)
-       
+#        print(2, params['SELECTION'])
+#        params['SELECTION'] = "operators.selection.tournament"
+#        print(3, params['SELECTION'])
+#        params['lexicase'] = False
+        
         # Set correct param imports for specified function options, including
         # error metrics and fitness functions.
         set_param_imports()
+#        print(4, params['SELECTION'])
 
         # Clean the stats dict to remove unused stats.
         clean_stats.clean_stats()
@@ -386,3 +397,67 @@ def set_params(command_line_args, create_files=True):
 
             # Parse seed individual and store in params.
             params['SEED_INDIVIDUALS'] = [GE_LR_parser.main()]
+            
+        #Criando testbench
+        #variables contains inputs and ONE output (at the end)
+#        if params['PROBLEM_TYPE'] == 'vhdl':
+#            if params['PROBLEM'] == 'ssd':
+#                dataset = open(r"../../VHDL/ssd/Train.csv","r")
+        
+#            elif params['PROBLEM'] == 'multiplexer':
+#                dataset = open(r"../../VHDL/multiplexer/Train.csv","r")
+            
+#            variables_string = dataset.readline()
+#            variables = variables_string.split()
+            
+            #quantity of inputs
+#            inputs = len(variables) - 1
+            
+#            if params['PROBLEM'] == 'ssd':
+#                file = open(r"../../VHDL/ssd/tb2.vhdl","w")
+#            elif params['PROBLEM'] == 'multiplexer':
+#                file = open(r"../../VHDL/multiplexer/tb2.vhdl","w")
+            
+#            file.write("""library ieee;
+#            use ieee.std_logic_textio.all;
+#            use ieee.std_logic_1164.all;
+            
+#            entity tb is
+#            end tb;
+            
+#            architecture test of tb is
+#            component ind
+#            port(""")
+            
+            #SSD             
+#            for i in range(inputs):
+#                file.write(variables[i] + ": in STD_LOGIC_VECTOR(3 downto 0); \n") #write inputs
+#            file.write(variables[inputs] + """: out STD_LOGIC_VECTOR (6 downto 0) --abcdefg
+    		
+#    	);
+#    	end component; 
+    
+#    signal d: STD_LOGIC_VECTOR (3 downto 0):= (others => '0');
+#    signal o: STD_LOGIC_VECTOR (6 downto 0):= (others => '0');
+    
+    
+#    begin
+#    individual: ind port map (d => d, o => o); 
+    
+#    	process begin 
+                       
+#                       """)
+            
+            #multiplexer 11 bits
+#            data = dataset.readlines()[0:] #it is reading from second line
+#            for line in data:
+                    
+#                data_separate = line.split()
+#                for i in range(inputs):
+#                    file.write(variables[i] + ' <= "' + data_separate[i] + '";\n')
+#                file.write("wait for 1 ns; \nreport " + "'" + " & to_hstring(o) & " + "'" + ";\n\n")
+            
+#            dataset.close()
+            
+#            file.write("	wait; \n	end process; \nend test;")
+#            file.close()

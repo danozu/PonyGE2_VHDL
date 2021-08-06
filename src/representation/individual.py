@@ -34,11 +34,16 @@ class Individual(object):
         self.fitness = params['FITNESS_FUNCTION'].default_fitness
         self.runtime_error = False
         self.name = None
+        #Remember to update function deep_copy() after including new attributes
         self.predict_result = [] #len = population_size; Each position receives 1 if prediction is correct, 0 if false.
+                                 #if LEXICASE_EACH_BIT is True, each position receives the number of bits predicted correctly
+#        if params['LEXICASE_EACH_BIT']:
+#            self.predict_result_bit = []
         self.partial_predict_result = [] #len < population_size; It is used for interleaved sampling
         self.n_samples = 0
         self.eval_ind = False #if the individual will be evaluated
-
+        self.crossover_probability = float('nan') #to use on adaptative approach
+        self.mutation_probability =  float('nan') #to use on adaptative approach
 
     def __lt__(self, other):
         """
@@ -109,6 +114,14 @@ class Individual(object):
         new_ind.depth, new_ind.nodes = self.depth, self.nodes
         new_ind.used_codons = self.used_codons
         new_ind.runtime_error = self.runtime_error
+        
+        #New attributes (maybe It is not necessary to update all here)
+        new_ind.predict_result = self.predict_result
+        new_ind.partial_predict_result = self.partial_predict_result
+        new_ind.n_samples = self.n_samples
+        new_ind.eval_ind = self.eval_ind
+        new_ind.crossover_probability = self.crossover_probability
+        new_ind.mutation_probability = self.mutation_probability 
 
         return new_ind
 
@@ -124,13 +137,15 @@ class Individual(object):
         """
 
         if params['lexicase']:
-            self.fitness, self.predict_result = params['FITNESS_FUNCTION'](self)
+            #self.fitness, self.predict_result = params['FITNESS_FUNCTION'](self)
+            self.fitness = params['FITNESS_FUNCTION'](self)
         else:            
             # Evaluate fitness using specified fitness function.
-            self.fitness, self.n_samples = params['FITNESS_FUNCTION'](self)
+            #self.fitness, self.n_samples = params['FITNESS_FUNCTION'](self)
+            self.fitness = params['FITNESS_FUNCTION'](self)
         
      
         
 
         if params['MULTICORE']:
-            return self
+            return self        

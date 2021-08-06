@@ -4,6 +4,7 @@ from algorithm.parameters import params
 from representation import individual
 from representation.latent_tree import latent_tree_crossover, latent_tree_repair
 from utilities.representation.check_methods import check_ind
+import numpy as np
 
 
 def crossover(parents):
@@ -99,9 +100,22 @@ def variable_onepoint(p_0, p_1):
         
     # Select unique points on each genome for crossover to occur.
     pt_0, pt_1 = randint(1, max_p_0), randint(1, max_p_1)
+    
+    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+        crossover_probability = np.nanmax([p_0.crossover_probability, p_1.crossover_probability])
+ #       if crossover_probability != 0.8:
+ #           print("diferente")
+ #           crossover_probability = 0.8
+    else:
+        crossover_probability = params['CROSSOVER_PROBABILITY']
+    
+#    if crossover_probability == float('nan'): #if the individual is invalid
+#        crossover_probability = 1
+#        crossover_probability = params['CROSSOVER_PROBABILITY']
+#    print(crossover_probability)
 
     # Make new chromosomes by crossover: these slices perform copies.
-    if random() < params['CROSSOVER_PROBABILITY']:
+    if random() < crossover_probability:#params['CROSSOVER_PROBABILITY']:
         c_0 = genome_0[:pt_0] + genome_1[pt_1:]
         c_1 = genome_1[:pt_1] + genome_0[pt_0:]
     else:
@@ -110,6 +124,13 @@ def variable_onepoint(p_0, p_1):
     # Put the new chromosomes into new individuals.
     ind_0 = individual.Individual(c_0, None)
     ind_1 = individual.Individual(c_1, None)
+    
+    # Maintain the same mutation probability to do the next step, if we are using adaptative crossover and mutation
+    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+        ind_0.crossover_probability = p_0.crossover_probability
+        ind_1.crossover_probability = p_1.crossover_probability
+        ind_0.mutation_probability = p_0.mutation_probability
+        ind_1.mutation_probability = p_1.mutation_probability
 
     return [ind_0, ind_1]
 
