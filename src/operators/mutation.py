@@ -71,7 +71,7 @@ def int_flip_per_codon(ind):
         # Linear mutation cannot be performed on this individual.
         return ind
 
-    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+    if params['ADAPTIVE_CROSSOVER_AND_MUTATION']:
         p_mut = ind.mutation_probability
     # Set mutation probability. Default is 1 over the length of the genome.
     elif params['MUTATION_PROBABILITY'] and params['MUTATION_EVENTS'] == 1:
@@ -99,7 +99,7 @@ def int_flip_per_codon(ind):
     # Re-build a new individual with the newly mutated genetic information.
     new_ind = individual.Individual(ind.genome, None)
     
-    if params['ADAPTATIVE_CROSSOVER_AND_MUTATION']:
+    if params['ADAPTIVE_CROSSOVER_AND_MUTATION']:
         new_ind.crossover_probability = ind.crossover_probability
         new_ind.mutation_probability = ind.mutation_probability
 
