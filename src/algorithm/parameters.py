@@ -12,10 +12,10 @@ machine_name = hostname[0]
 params = {
         #New parameters 
         'LEXICASE_EACH_BIT': False, #if True, compare each bit of the output to give a fitness score for each sample
-        'ADAPTATIVE_CROSSOVER_AND_MUTATION': False,  #if True, ignore crossover and mutation probabilities and use adaptative approach
+        'ADAPTIVE_CROSSOVER_AND_MUTATION': True,  #if True, ignore crossover and mutation probabilities and use adaptative approach
                                                     # it works just for variable_onepoint (crossover)
         'COUNT_SAMPLES_USED_LEXICASE': False, #if true, count how many times each sample was chosen by Lexicase
-        'COUNT_CRITICAL_PATH': False, #if true, count the number of gates in the critical path
+        #'COUNT_CRITICAL_PATH': False, #if true, count the number of gates in the critical path
         'ONE_FILE_PER_GENERATION': False,#True, #if true, put all individuals in just one vhdl file.
         'COUNT_GATES': False, #if true, put the number of gates in the stats
         'GATES_TO_COUNT': ['and', 'xor'], # ['elsif'], ##list of the gates to count
