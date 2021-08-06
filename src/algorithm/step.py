@@ -3,7 +3,7 @@ from operators.crossover import crossover
 from operators.mutation import mutation
 from operators.replacement import replacement, steady_state
 from operators.selection import selection
-from operators.adaptative import update_crossover_and_mutation
+from operators.adaptive import update_crossover_and_mutation
 from algorithm.parameters import params
 from stats.stats import get_stats
 
