@@ -122,6 +122,8 @@ def parse_cmd_args(arguments):
 
     parser.add_argument('--adaptive_crossover_and_mutation',
                         dest='ADAPTIVE_CROSSOVER_AND_MUTATION',
+                        action='store_false',
+                        default=True,
                         action='store',
                         help='Enable adaptive approach')
     
